@@ -39,14 +39,19 @@ public class ProductBasket {
      * метод метод вывода содержимого корзины
      */
     public void printBasketProduct() {
+        int specialPriceCount = 0;
         if (count == 0) {
             System.out.println("в корзине пусто");
             return;
         }
         for (int i = 0; i < count; i++) {
-            System.out.println(productBasket[i].getName() + ": " + productBasket[i].getPrice());
+            System.out.println(productBasket[i]);
+            if (productBasket[i].isSpecial()) {
+                specialPriceCount++;
+            }
         }
         System.out.println("Итого: " + getBasketTotalCost());
+        System.out.println("Специальных товаров: " + specialPriceCount);
     }
 
     /**
