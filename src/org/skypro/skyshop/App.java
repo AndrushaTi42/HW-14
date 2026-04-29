@@ -1,17 +1,20 @@
 package org.skypro.skyshop;
 
 import org.skypro.skyshop.basket.ProductBasket;
+import org.skypro.skyshop.product.DiscountedProduct;
+import org.skypro.skyshop.product.FixPriceProduct;
 import org.skypro.skyshop.product.Product;
+import org.skypro.skyshop.product.SimpleProduct;
 
 public class App {
     public static void main(String[] args) {
 //создаем продукты
-        Product egg = new Product("Egg", 120);
-        Product milk = new Product("Milk", 140);
-        Product meat = new Product("Meat", 550);
-        Product tea = new Product("Tea", 200);
-        Product butter = new Product("Butter", 250);
-        Product water = new Product("Water", 55);
+        Product egg = new FixPriceProduct("Egg");
+        Product milk = new SimpleProduct("Milk", 140);
+        Product meat = new DiscountedProduct("Meat", 550, 15);
+        Product tea = new SimpleProduct("Tea", 200);
+        Product butter = new FixPriceProduct("Butter");
+        Product water = new SimpleProduct("Water", 55);
 //инициализация объекта класса ProductBasket
         ProductBasket basket = new ProductBasket();
 // 1. добавляем продукты в корзину
@@ -47,6 +50,7 @@ public class App {
         printSep();
 // 10. Поиск товара по имени в пустой корзине.
         System.out.println(basket.existsByProductName("Milk"));
+
     }
 
     public static void printSep() {
