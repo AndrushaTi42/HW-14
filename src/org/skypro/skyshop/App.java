@@ -1,10 +1,11 @@
 package org.skypro.skyshop;
 
 import org.skypro.skyshop.basket.ProductBasket;
-import org.skypro.skyshop.product.DiscountedProduct;
-import org.skypro.skyshop.product.FixPriceProduct;
-import org.skypro.skyshop.product.Product;
-import org.skypro.skyshop.product.SimpleProduct;
+import org.skypro.skyshop.product.*;
+import org.skypro.skyshop.search.SearchEngine;
+import org.skypro.skyshop.search.Searchable;
+
+import java.util.Arrays;
 
 public class App {
     public static void main(String[] args) {
@@ -50,10 +51,55 @@ public class App {
         printSep();
 // 10. Поиск товара по имени в пустой корзине.
         System.out.println(basket.existsByProductName("Milk"));
+        printSep();
+// 11. Создаем статью о товаре.
+        Article articleOfButter = new Article("Алтайские хлеба",
+                "Наш хлеб мы выпекаем самостоятельно, потому он всегда свежий. " +
+                        "После 20:00 скидка на хлебобулочную продукцию 35%");
+// 12. Инициализация объекта класса searchEngine.
+        SearchEngine searchEngine = new SearchEngine(10);
+// 13. Добавляю продукты/статью в массив поиска.
+        searchEngine.add(egg);
+        searchEngine.add(meat);
+        searchEngine.add(milk);
+        searchEngine.add(butter);
+        searchEngine.add(articleOfButter);
+        searchEngine.add(water);
+// 14. Проверка работы поиска по статье и продукту.
+        Searchable[] results = searchEngine.search("алтайские хлеба");
+        printResults(results);
+        results = searchEngine.search("water");
+        printResults(results);
+        printSep();
+// 15. Проверка новых методов
+        System.out.println(articleOfButter.getSearchTerm());
+        System.out.println(articleOfButter.getContentType());
+        printSep();
+        System.out.println(water.getSearchTerm());
+        System.out.println(water.getContentType());
 
     }
 
+
     public static void printSep() {
         System.out.println("=======================");
+    }
+
+    /**
+     * метод для вывода поиска без null
+     *
+     * @param results
+     */
+    public static void printResults(Searchable[] results) {
+        boolean found = false;
+        for (Searchable item : results) {
+            if (item != null) {
+                System.out.println(item.getStringRepresentation());
+                found = true;
+            }
+        }
+        if (!found) {
+            System.out.println("Ничего не найдено.");
+        }
     }
 }
