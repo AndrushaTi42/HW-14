@@ -40,6 +40,7 @@ public class SearchEngine {
      * @param item
      */
     public void add(Searchable item) {
+        if (item == null) return;
         if (size < searchables.length) {
             searchables[size] = item;
             size++;
