@@ -45,7 +45,7 @@ public class SearchEngine {
             searchables[size] = item;
             size++;
         } else {
-            System.out.println("Не возможно добавить - массив переполнен");
+            System.out.println("Не возможно добавить - массив переполнен.");
         }
 
     }
