@@ -2,6 +2,7 @@ package org.skypro.skyshop;
 
 import org.skypro.skyshop.basket.ProductBasket;
 import org.skypro.skyshop.product.*;
+import org.skypro.skyshop.search.BestResultNotFound;
 import org.skypro.skyshop.search.SearchEngine;
 import org.skypro.skyshop.search.Searchable;
 
@@ -71,12 +72,43 @@ public class App {
         results = searchEngine.search("water");
         printResults(results);
         printSep();
-// 15. Проверка новых методов
+// 15. Проверка новых методов.
         System.out.println(articleOfButter.getSearchTerm());
         System.out.println(articleOfButter.getContentType());
         printSep();
         System.out.println(water.getSearchTerm());
         System.out.println(water.getContentType());
+        printSep();
+// 16. Создание заведомо неверных продуктов для проверки исключений.
+        try {
+            Product cola = new DiscountedProduct("Cola", 150, 110);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e);
+        }
+        try {
+            Product chips = new SimpleProduct("Lays", 0);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e);
+        }
+        try {
+            Product rice = new FixPriceProduct(" ");
+        } catch (IllegalArgumentException e) {
+            System.out.println(e);
+        }
+        printSep();
+// 17. Проверка работы метода findBestMatch.
+        try {
+            Searchable result = searchEngine.findBestMatch("оладьи");
+            System.out.println("Лучшее совпадение " + result.getStringRepresentation());
+        } catch (BestResultNotFound e) {
+            System.out.println(e.getMessage());
+        }
+        try {
+            Searchable result = searchEngine.findBestMatch("хлеб");
+            System.out.println("Лучшее совпадение " + result.getStringRepresentation());
+        } catch (BestResultNotFound e) {
+            System.out.println(e.getMessage());
+        }
 
     }
 
