@@ -7,6 +7,8 @@ import org.skypro.skyshop.search.SearchEngine;
 import org.skypro.skyshop.search.Searchable;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 public class App {
     public static void main(String[] args) {
@@ -19,67 +21,61 @@ public class App {
         Product water = new SimpleProduct("Water", 55);
 //инициализация объекта класса ProductBasket
         ProductBasket basket = new ProductBasket();
+//        List<ProductBasket> basket = new LinkedList<>();
 // 1. добавляем продукты в корзину
         basket.addProduct(egg);
         basket.addProduct(meat);
         basket.addProduct(milk);
         basket.addProduct(butter);
         basket.addProduct(water);
-// 2. добавление в переполненную корзину
-        basket.addProduct(tea);
-        printSep();
-// 3. Печать содержимого корзины с несколькими товарами.
+// 2. Печать содержимого корзины с несколькими товарами.
         basket.printBasketProduct();
         printSep();
-// 4. Получение стоимости корзины с несколькими товарами.
+// 3. Получение стоимости корзины с несколькими товарами.
         System.out.println(basket.getBasketTotalCost());
         printSep();
-// 5. Поиск товара, который есть в корзине.
+// 4. Поиск товара, который есть в корзине.
         System.out.println(basket.existsByProductName("Milk"));
         printSep();
-// 6. Поиск товара, которого нет в корзине.
+// 5. Поиск товара, которого нет в корзине.
         System.out.println(basket.existsByProductName("Tea"));
         printSep();
-// 7. Очистка корзины.
+// 6. Очистка корзины.
         basket.clearBasket();
-        basket.clearBasket(); //второй раз для проверки вывода "в корзине пусто"
-        printSep();
-// 8. Печать содержимого пустой корзины.
+// 7. Печать содержимого пустой корзины.
         basket.printBasketProduct();
         printSep();
-// 9. Получение стоимости пустой корзины.
+// 8. Получение стоимости пустой корзины.
         System.out.println(basket.getBasketTotalCost());
         printSep();
-// 10. Поиск товара по имени в пустой корзине.
+// 9. Поиск товара по имени в пустой корзине.
         System.out.println(basket.existsByProductName("Milk"));
         printSep();
-// 11. Создаем статью о товаре.
+// 10. Создаем статью о товаре.
         Article articleOfButter = new Article("Алтайские хлеба",
                 "Наш хлеб мы выпекаем самостоятельно, потому он всегда свежий. " +
                         "После 20:00 скидка на хлебобулочную продукцию 35%");
-// 12. Инициализация объекта класса searchEngine.
-        SearchEngine searchEngine = new SearchEngine(10);
-// 13. Добавляю продукты/статью в массив поиска.
+// 11. Инициализация объекта класса searchEngine.
+        SearchEngine searchEngine = new SearchEngine();
+// 12. Добавляю продукты/статью в массив поиска.
         searchEngine.add(egg);
         searchEngine.add(meat);
         searchEngine.add(milk);
         searchEngine.add(butter);
         searchEngine.add(articleOfButter);
         searchEngine.add(water);
-// 14. Проверка работы поиска по статье и продукту.
-        Searchable[] results = searchEngine.search("алтайские хлеба");
-        printResults(results);
-        results = searchEngine.search("water");
-        printResults(results);
+// 13. Проверка работы поиска по статье и продукту.
+        printResults(searchEngine.search("алтайские хлеба"));
+        printResults(searchEngine.search("water"));
         printSep();
-// 15. Проверка новых методов.
+// 14. Проверка новых методов.
         System.out.println(articleOfButter.getSearchTerm());
         System.out.println(articleOfButter.getContentType());
         printSep();
         System.out.println(water.getSearchTerm());
         System.out.println(water.getContentType());
         printSep();
-// 16. Создание заведомо неверных продуктов для проверки исключений.
+// 15. Создание заведомо неверных продуктов для проверки исключений.
         try {
             Product cola = new DiscountedProduct("Cola", 150, 110);
         } catch (IllegalArgumentException e) {
@@ -96,7 +92,7 @@ public class App {
             System.out.println(e);
         }
         printSep();
-// 17. Проверка работы метода findBestMatch.
+// 16. Проверка работы метода findBestMatch.
         try {
             Searchable result = searchEngine.findBestMatch("оладьи");
             System.out.println("Лучшее совпадение " + result.getStringRepresentation());
@@ -109,6 +105,26 @@ public class App {
         } catch (BestResultNotFound e) {
             System.out.println(e.getMessage());
         }
+        printSep();
+// 17. Проверка удаления по именованию removeProduct
+        //сперва добавлю в корзину
+        basket.addProduct(egg);
+        basket.addProduct(meat);
+        basket.addProduct(milk);
+        basket.addProduct(butter);
+        basket.addProduct(water);
+        //далее проверяю removeProduct и вывожу удаленные продукты
+        System.out.println(basket.removeProduct("Egg"));
+        System.out.println(basket.removeProduct("meat"));
+        printSep();
+// 18. Вывод содержимого корзины после удаления
+        basket.printBasketProduct();
+        printSep();
+// 19. Удаление несуществующего продукта
+        basket.removeProduct("oil");
+        printSep();
+// 20.  Вывод содержимого корзины
+        basket.printBasketProduct();
 
     }
 
@@ -122,16 +138,13 @@ public class App {
      *
      * @param results
      */
-    public static void printResults(Searchable[] results) {
-        boolean found = false;
-        for (Searchable item : results) {
-            if (item != null) {
-                System.out.println(item.getStringRepresentation());
-                found = true;
-            }
-        }
-        if (!found) {
+    public static void printResults(List<Searchable> results) {
+        if (results.isEmpty()) {
             System.out.println("Ничего не найдено.");
+            return;
+        }
+        for (Searchable item : results) {
+            System.out.println(item.getStringRepresentation());
         }
     }
 }

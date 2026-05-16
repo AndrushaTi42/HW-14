@@ -1,14 +1,11 @@
 package org.skypro.skyshop.search;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 public class SearchEngine {
-    private final Searchable[] searchables;
-    int size = 0; //счетчик для добавления в массив
-
-    public SearchEngine(int index) {
-        this.searchables = new Searchable[index]; //размерность массива ч/з конструктор
-    }
+    private final List<Searchable> searchables = new LinkedList<>();
 
     /**
      * метод поиска
@@ -16,19 +13,12 @@ public class SearchEngine {
      * @param query
      * @return
      */
-    public Searchable[] search(String query) {
-        Searchable[] results = new Searchable[5];
-        int foundCount = 0;
-        for (int i = 0; i < searchables.length; i++) {
-            if (searchables[i] != null && searchables[i].getSearchTerm()
-                    .toLowerCase().contains(query.toLowerCase())) {
-                results[foundCount] = searchables[i];
-                foundCount++;
-                if (foundCount == 5) {
-                    break;
-                }
+    public List<Searchable> search(String query) {
+        List<Searchable> results = new LinkedList<>();
+        for (Searchable searchable : searchables) {
+            if (searchable.getSearchTerm().toLowerCase().contains(query.toLowerCase())) {
+                results.add(searchable);
             }
-
         }
         return results;
     }
@@ -40,18 +30,12 @@ public class SearchEngine {
      * @param item
      */
     public void add(Searchable item) {
-        if (item == null) return;
-        if (size < searchables.length) {
-            searchables[size] = item;
-            size++;
-        } else {
-            System.out.println("Не возможно добавить - массив переполнен.");
-        }
-
+        searchables.add(item);
     }
 
     /**
      * метод поиска лучшего совпадения
+     *
      * @param search
      * @return
      * @throws BestResultNotFound
@@ -60,7 +44,6 @@ public class SearchEngine {
         Searchable bestMatch = null;
         int maxCount = 0;
         for (Searchable searchable : searchables) {
-            if (searchable == null) continue;
             int currentCount = 0;
             int index = 0;
             String text = searchable.getSearchTerm().toLowerCase();
