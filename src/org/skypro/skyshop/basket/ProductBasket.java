@@ -2,13 +2,10 @@ package org.skypro.skyshop.basket;
 
 import org.skypro.skyshop.product.Product;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class ProductBasket {
-    private List<Product> productBasket = new LinkedList<>();
+    private final Map<String, List<Product>> productBasket = new HashMap<>();
 
 
     /**
@@ -17,7 +14,9 @@ public class ProductBasket {
      * @param newProduct
      */
     public void addProduct(Product newProduct) {
-        productBasket.add(newProduct);
+        // Если имени нет, computeIfAbsent создаст для него пустой ArrayList,
+        // а затем добавляется (add) новый продукт в этот список
+        productBasket.computeIfAbsent(newProduct.getName(), k -> new ArrayList<>()).add(newProduct);
     }
 
     /**
@@ -27,8 +26,12 @@ public class ProductBasket {
      */
     public int getBasketTotalCost() {
         int sumBasket = 0;
-        for (Product product : productBasket) {
-            sumBasket += product.getPrice();
+        // 1. Внешний цикл: беру списки товаров из Map'ы
+        for (List<Product> productsWithSameName : productBasket.values()) {
+            // 2. Внутренний цикл: перебираю товары внутри текущего списка
+            for (Product product : productsWithSameName) {
+                sumBasket += product.getPrice();
+            }
         }
         return sumBasket;
     }
@@ -42,10 +45,12 @@ public class ProductBasket {
             System.out.println("в корзине пусто");
             return;
         }
-        for (Product product : productBasket) {
-            System.out.println(product);
-            if (product.isSpecial()) {
-                specialPriceCount++;
+        for (List<Product> productsWithSameName : productBasket.values()) {
+            for (Product product : productsWithSameName) {
+                System.out.println(product);
+                if (product.isSpecial()) {
+                    specialPriceCount++;
+                }
             }
         }
         System.out.println("Итого: " + getBasketTotalCost());
@@ -59,12 +64,8 @@ public class ProductBasket {
      * @return
      */
     public boolean existsByProductName(String targetName) {
-        for (Product product : productBasket) {
-            if (Objects.equals(targetName, product.getName())) {
-                return true;
-            }
-        }
-        return false;
+//      return productBasket.getOrDefault(targetName, null) != null;
+        return productBasket.containsKey(targetName);
     }
 
     /**
@@ -81,17 +82,13 @@ public class ProductBasket {
      * @return
      */
     public List<Product> removeProduct(String name) {
-        List<Product> removedProducts = new LinkedList();
-        Iterator<Product> iterator = productBasket.iterator();
-        while (iterator.hasNext()) {
-            Product currentProduct = iterator.next();
-            if (currentProduct.getName().equalsIgnoreCase(name)) {
-                removedProducts.add(currentProduct);
-                iterator.remove();
-            }
-        }
-        if (removedProducts.isEmpty()) {
+        // 1. Удаление ключа из Map'ы и присваивание удаленного списка в removedProducts
+        List<Product> removedProducts = productBasket.remove(name);
+        // 2. Если имя не найдено, метод remove вернет null.
+        if (removedProducts == null) {
+            // Возвращаю пустой список вместо null
             System.out.println("Список пуст");
+            return new ArrayList<>();
         }
         return removedProducts;
     }

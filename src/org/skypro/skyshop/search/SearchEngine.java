@@ -1,23 +1,21 @@
 package org.skypro.skyshop.search;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class SearchEngine {
     private final List<Searchable> searchables = new LinkedList<>();
 
     /**
-     * метод поиска
+     * метод поиска, возвращающий отсортированную по именам Map'у
      *
-     * @param query
-     * @return
+     * @param query поисковый запрос
+     * @return Map, где ключ это имя объекта, а значение это сам объект Searchable
      */
-    public List<Searchable> search(String query) {
-        List<Searchable> results = new LinkedList<>();
+    public Map<String, Searchable> search(String query) {
+        Map<String, Searchable> results = new TreeMap<>();
         for (Searchable searchable : searchables) {
             if (searchable.getSearchTerm().toLowerCase().contains(query.toLowerCase())) {
-                results.add(searchable);
+                results.put(searchable.getName(), searchable);
             }
         }
         return results;

@@ -9,6 +9,7 @@ import org.skypro.skyshop.search.Searchable;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class App {
     public static void main(String[] args) {
@@ -21,7 +22,6 @@ public class App {
         Product water = new SimpleProduct("Water", 55);
 //инициализация объекта класса ProductBasket
         ProductBasket basket = new ProductBasket();
-//        List<ProductBasket> basket = new LinkedList<>();
 // 1. добавляем продукты в корзину
         basket.addProduct(egg);
         basket.addProduct(meat);
@@ -138,12 +138,12 @@ public class App {
      *
      * @param results
      */
-    public static void printResults(List<Searchable> results) {
+    public static void printResults(Map<String, Searchable> results) {
         if (results.isEmpty()) {
             System.out.println("Ничего не найдено.");
             return;
         }
-        for (Searchable item : results) {
+        for (Searchable item : results.values()) {
             System.out.println(item.getStringRepresentation());
         }
     }
