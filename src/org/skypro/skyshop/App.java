@@ -6,10 +6,7 @@ import org.skypro.skyshop.search.BestResultNotFound;
 import org.skypro.skyshop.search.SearchEngine;
 import org.skypro.skyshop.search.Searchable;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class App {
     public static void main(String[] args) {
@@ -125,6 +122,10 @@ public class App {
         printSep();
 // 20.  Вывод содержимого корзины
         basket.printBasketProduct();
+        printSep();
+//21. Проверка нового вывода всех элементов с сортировкой длины имен по убыванию
+        Set<Searchable> allElement = searchEngine.search("");
+        printResults(allElement);
 
     }
 
@@ -138,12 +139,12 @@ public class App {
      *
      * @param results
      */
-    public static void printResults(Map<String, Searchable> results) {
+    public static void printResults(Set<Searchable> results) {
         if (results.isEmpty()) {
             System.out.println("Ничего не найдено.");
             return;
         }
-        for (Searchable item : results.values()) {
+        for (Searchable item : results) {
             System.out.println(item.getStringRepresentation());
         }
     }
