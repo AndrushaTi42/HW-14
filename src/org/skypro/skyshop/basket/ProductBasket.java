@@ -2,11 +2,11 @@ package org.skypro.skyshop.basket;
 
 import org.skypro.skyshop.product.Product;
 
-import java.util.Objects;
+import java.util.*;
 
 public class ProductBasket {
-    private Product[] productBasket = new Product[5];
-    private int count = 0;
+    private final Map<String, List<Product>> productBasket = new HashMap<>();
+
 
     /**
      * метод добавления продуктов в корзину
@@ -14,12 +14,9 @@ public class ProductBasket {
      * @param newProduct
      */
     public void addProduct(Product newProduct) {
-        if (count < productBasket.length) {
-            productBasket[count] = newProduct;
-            count++;
-        } else {
-            System.out.println("Невозможно добавить продукт");
-        }
+        // Если имени нет, computeIfAbsent создаст для него пустой ArrayList,
+        // а затем добавляется (add) новый продукт в этот список
+        productBasket.computeIfAbsent(newProduct.getName(), k -> new ArrayList<>()).add(newProduct);
     }
 
     /**
@@ -28,30 +25,46 @@ public class ProductBasket {
      * @return
      */
     public int getBasketTotalCost() {
-        int sumBasket = 0;
-        for (int i = 0; i < count; i++) {
-            sumBasket += productBasket[i].getPrice();
-        }
-        return sumBasket;
+//        int sumBasket = 0;
+//        // 1. Внешний цикл: беру списки товаров из Map'ы
+//        for (List<Product> productsWithSameName : productBasket.values()) {
+//            // 2. Внутренний цикл: перебираю товары внутри текущего списка
+//            for (Product product : productsWithSameName) {
+//                sumBasket += product.getPrice();
+//            }
+//        }
+//        return sumBasket;
+        return productBasket.values().stream()
+                .flatMap(Collection::stream)  //list -> list.stream()
+                .mapToInt(Product::getPrice) // Достаем цену каждого товара
+                .sum();                      //суммируем
     }
 
     /**
-     * метод метод вывода содержимого корзины
+     * метод подсчета спец товаров
+     */
+    private long getSpecialCount() {
+        return (int) productBasket.values().stream()
+                .flatMap(Collection::stream)
+                .filter(Product::isSpecial) //фильтруем специальные товары
+                .count();                   //подсчет количества
+    }
+
+    /**
+     * метод вывода содержимого корзины
      */
     public void printBasketProduct() {
-        int specialPriceCount = 0;
-        if (count == 0) {
+        if (productBasket.isEmpty()) {
             System.out.println("в корзине пусто");
             return;
         }
-        for (int i = 0; i < count; i++) {
-            System.out.println(productBasket[i]);
-            if (productBasket[i].isSpecial()) {
-                specialPriceCount++;
-            }
-        }
+        //печать каждого товара из стрима
+        productBasket.values().stream()
+                .flatMap(Collection::stream)
+                .forEach(System.out::println); //product -> System.out.println(product)
+        //Итоговый вывод:
         System.out.println("Итого: " + getBasketTotalCost());
-        System.out.println("Специальных товаров: " + specialPriceCount);
+        System.out.println("Специальных товаров: " + getSpecialCount());
     }
 
     /**
@@ -61,26 +74,32 @@ public class ProductBasket {
      * @return
      */
     public boolean existsByProductName(String targetName) {
-        for (int i = 0; i < count; i++) {
-            if (Objects.equals(targetName, productBasket[i].getName())) {
-                return true;
-            }
-        }
-        return false;
+        return productBasket.containsKey(targetName);
     }
 
     /**
      * метод отчистки корзины
      */
     public void clearBasket() {
-        if (count == 0) {
-            System.out.println("в корзине пусто");
-            return;
+        productBasket.clear();
+    }
+
+    /**
+     * метод удаления продукта по имени из корзины
+     *
+     * @param name
+     * @return
+     */
+    public List<Product> removeProduct(String name) {
+        // 1. Удаление ключа из Map'ы и присваивание удаленного списка в removedProducts
+        List<Product> removedProducts = productBasket.remove(name);
+        // 2. Если имя не найдено, метод remove вернет null.
+        if (removedProducts == null) {
+            // Возвращаю пустой список вместо null
+            System.out.println("Список пуст");
+            return new ArrayList<>();
         }
-        for (int i = 0; i < count; i++) {
-            productBasket[i] = null;
-        }
-        count = 0;
+        return removedProducts;
     }
 
 }
