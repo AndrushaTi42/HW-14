@@ -25,36 +25,46 @@ public class ProductBasket {
      * @return
      */
     public int getBasketTotalCost() {
-        int sumBasket = 0;
-        // 1. Внешний цикл: беру списки товаров из Map'ы
-        for (List<Product> productsWithSameName : productBasket.values()) {
-            // 2. Внутренний цикл: перебираю товары внутри текущего списка
-            for (Product product : productsWithSameName) {
-                sumBasket += product.getPrice();
-            }
-        }
-        return sumBasket;
+//        int sumBasket = 0;
+//        // 1. Внешний цикл: беру списки товаров из Map'ы
+//        for (List<Product> productsWithSameName : productBasket.values()) {
+//            // 2. Внутренний цикл: перебираю товары внутри текущего списка
+//            for (Product product : productsWithSameName) {
+//                sumBasket += product.getPrice();
+//            }
+//        }
+//        return sumBasket;
+        return productBasket.values().stream()
+                .flatMap(Collection::stream)  //list -> list.stream()
+                .mapToInt(Product::getPrice) // Достаем цену каждого товара
+                .sum();                      //суммируем
     }
 
     /**
-     * метод метод вывода содержимого корзины
+     * метод подсчета спец товаров
+     */
+    private long getSpecialCount() {
+        return (int) productBasket.values().stream()
+                .flatMap(Collection::stream)
+                .filter(Product::isSpecial) //фильтруем специальные товары
+                .count();                   //подсчет количества
+    }
+
+    /**
+     * метод вывода содержимого корзины
      */
     public void printBasketProduct() {
-        int specialPriceCount = 0;
         if (productBasket.isEmpty()) {
             System.out.println("в корзине пусто");
             return;
         }
-        for (List<Product> productsWithSameName : productBasket.values()) {
-            for (Product product : productsWithSameName) {
-                System.out.println(product);
-                if (product.isSpecial()) {
-                    specialPriceCount++;
-                }
-            }
-        }
+        //печать каждого товара из стрима
+        productBasket.values().stream()
+                .flatMap(Collection::stream)
+                .forEach(System.out::println); //product -> System.out.println(product)
+        //Итоговый вывод:
         System.out.println("Итого: " + getBasketTotalCost());
-        System.out.println("Специальных товаров: " + specialPriceCount);
+        System.out.println("Специальных товаров: " + getSpecialCount());
     }
 
     /**
@@ -64,7 +74,6 @@ public class ProductBasket {
      * @return
      */
     public boolean existsByProductName(String targetName) {
-//      return productBasket.getOrDefault(targetName, null) != null;
         return productBasket.containsKey(targetName);
     }
 
